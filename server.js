@@ -1,55 +1,55 @@
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
-import hpp from 'hpp';
-import cors from 'cors';
+import express from "express";
+import { PORT, REQUEST_LIMIT_NUMBER, REQUEST_LIMIT_TIME } from "./conf/config.js";
+import connectDB from "./lib/connectDb.js";
+import hpp from "hpp";
+import helmet from "helmet";
+import cors from "cors";
 import cookieParser from "cookie-parser";
-import connectDb from './lib/connectDb.js';
-import apiRouter from './routes/api.js';
-import {MAX_JSON_SIZE,REQUEST_LIMIT_NUMBER, REQUEST_LIMIT_TIME, URL_ENCODED, WEB_CACHE,PORT} from "./configs/config.js";
-import notFound from './controllers/notFound.js';
-
+import rateLimit from "express-rate-limit";
+import apiRouter from "./routes/api.js";
+import { testMiddleware } from "./moddleware/test.js";
+import defaultErrorHandler from "./moddleware/defaultErrorHandler.js";
 
 const app = express();
 
-// middlewares
-app.use(cors());
-app.use(helmet());
-app.use(hpp());
+// Middleware
+
+app.use(hpp())
+app.use(helmet())
+app.use(cors())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'))
 app.use(cookieParser())
-app.use(express.json({ limit: MAX_JSON_SIZE }));
-app.use(express.urlencoded({extended: URL_ENCODED}));
-const limiter = rateLimit({ windowMs: REQUEST_LIMIT_TIME, max: REQUEST_LIMIT_NUMBER });
-app.use(limiter);
+const limiter = rateLimit({
+    windowMs: REQUEST_LIMIT_TIME,
+    limit: REQUEST_LIMIT_NUMBER,
+})
+
+app.use(limiter)
 
 
 
-
-// *Web cache validation and conditional requests in Http
-app.set('etag', WEB_CACHE);
-
-
-
-// Connect to DB:
-connectDb()
-
-
-// API routes
-app.use("/api", apiRouter);
-
-
-//* Serve static assets for React front end
-app.use(express.static('public'));
-
-// * Not Found handlers
-app.get('*', notFound);
-
-
-// ! Default Error Handler::
-// app.use(defaultErrorHandler);
+// connect DB:
+connectDB()
 
 
 
-app.listen(PORT,()=>{
+app.use("/api",apiRouter)
+
+app.get('*', (req, res)=>{
+    res.status(404).json({
+        success: false,
+        message: "Page Not Found❗"
+    })
+})
+
+
+// Default Error Handel
+app.use(defaultErrorHandler)
+
+
+
+app.listen(PORT, () => {
     console.log(`Server Running on http://localhost:${PORT}`)
-});
+})

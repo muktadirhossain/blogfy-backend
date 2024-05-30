@@ -1,14 +1,11 @@
-import {Router} from 'express';
+import { Router } from 'express'
+import { createUser } from '../controllers/user.js';
+
 const apiRouter = Router();
 
+// path - /api/users/create
+apiRouter.post('/users/create', createUser)
 
-apiRouter.get('/', (req, res) => {
 
-    res.json({
-        success: true,
-        message: "API Route is working properly!",
-        logo: '/logo.png'
-    })
-});
 
-export default apiRouter
+export default apiRouter; 
