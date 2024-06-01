@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
     fullName: {
         type: String,
         required: true,
-        unique: [true, "Name is required !"]
+        unique: false,
     },
     email: {
         type: String,
@@ -23,8 +23,12 @@ const userSchema = new mongoose.Schema({
         default: ""
 
     },
+},{
+    timestamps: true,
+
 });
 
 const User = mongoose.model('User', userSchema);
 
 export default User;
+

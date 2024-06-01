@@ -21,3 +21,4 @@ export const REQUEST_LIMIT_NUMBER = parseInt(process.env.REQUEST_LIMIT_NUMBER, 1
 export const WEB_CACHE = process.env.WEB_CACHE === 'true';
 
 export const PORT = parseInt(process.env.PORT, 10) || 3000;
+export const SALT_HASH = parseInt(process.env.SALT_HASH);
