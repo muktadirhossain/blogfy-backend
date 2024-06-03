@@ -7,8 +7,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import apiRouter from "./routes/api.js";
-import { testMiddleware } from "./moddleware/test.js";
-import defaultErrorHandler from "./moddleware/defaultErrorHandler.js";
+import defaultErrorHandler from "./middleware/defaultErrorHandler.js";
 
 const app = express();
 
