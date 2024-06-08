@@ -22,9 +22,9 @@ const blogSchema = new mongoose.Schema({
     tags: {
         type: String
     },
-    coverImage: {
-        type: String,
-        default: "/post-cover.png"
+    images: {
+        type: Array,
+        default: ["/post-cover.png"]
     },
     comments: [{
         type: mongoose.Schema.Types.ObjectId,

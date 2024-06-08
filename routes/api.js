@@ -4,6 +4,7 @@ import { userValidator } from '../validation/userValidationSchema.js';
 import { getAllCategories, createCategory, getCategoryById, deleteCategoryById, updateCategoryById } from '../controllers/category.js';
 import auth from '../middleware/auth.js';
 import { deleteBlogById, getAllBlogs, getBlogById, postBlog } from '../controllers/blog.js';
+import upload from '../middleware/multer/upload.js';
 
 
 
@@ -22,7 +23,7 @@ apiRouter.delete('/category/delete/:id', auth, deleteCategoryById)
 apiRouter.post('/category/update/:id', auth, updateCategoryById)
 
 // Blog or Post::
-apiRouter.post('/blog', auth, postBlog)
+apiRouter.post('/blog', upload.array('img', 5) ,auth, postBlog)
 apiRouter.get('/blog', getAllBlogs)
 apiRouter.get('/blog/:id', getBlogById)
 apiRouter.delete('/blog/:id', deleteBlogById)
