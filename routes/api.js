@@ -1,10 +1,23 @@
 import { Router } from 'express'
 import { createUser, deleteUser, login } from '../controllers/user.js';
 import { userValidator } from '../validation/userValidationSchema.js';
-import { getAllCategories, createCategory, getCategoryById, deleteCategoryById, updateCategoryById } from '../controllers/category.js';
+import {
+    getAllCategories,
+    createCategory,
+    getCategoryById,
+    deleteCategoryById,
+    updateCategoryById
+} from '../controllers/category.js';
+import {
+    deleteBlogById,
+    getAllBlogs,
+    getBlogById,
+    postBlog,
+    updateBlogById
+} from '../controllers/blog.js';
 import auth from '../middleware/auth.js';
-import { deleteBlogById, getAllBlogs, getBlogById, postBlog } from '../controllers/blog.js';
 import upload from '../middleware/multer/upload.js';
+import { postComment, getCommentByPostId } from '../controllers/comment.js';
 
 
 
@@ -23,11 +36,14 @@ apiRouter.delete('/category/delete/:id', auth, deleteCategoryById)
 apiRouter.post('/category/update/:id', auth, updateCategoryById)
 
 // Blog or Post::
-apiRouter.post('/blog', upload.array('img', 5) ,auth, postBlog)
+apiRouter.post('/blog', upload.array('img', 5), auth, postBlog)
 apiRouter.get('/blog', getAllBlogs)
 apiRouter.get('/blog/:id', getBlogById)
-apiRouter.delete('/blog/:id', deleteBlogById)
-
+apiRouter.delete('/blog/:id', auth, deleteBlogById)
+apiRouter.patch('/blog/:id', upload.array('img', 5), auth, updateBlogById)
+// Comment::
+apiRouter.post('/comment', auth, postComment)
+apiRouter.get('/comment/:postId', getCommentByPostId)
 
 
 

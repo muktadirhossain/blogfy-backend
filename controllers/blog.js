@@ -4,7 +4,7 @@ import path from 'path';
 
 export const postBlog = async (req, res) => {
     const { title, content, categoryId, tags } = req.body;
-    
+
     const { _id } = req.user
     try {
         const imgArray = req.files.map((file) => `/upload/${file.filename}`)
@@ -65,17 +65,11 @@ export const getBlogById = async (req, res) => {
     }
 }
 export const deleteBlogById = async (req, res) => {
-    // console.log(req.params)
     const { id } = req.params
-    console.log(id)
-    console.log(path.resolve())
-    
     try {
-
         // Delete the Images from the server:
         const blog = await Blog.findOne({ _id: id })
-        console.log(blog)
-        if(!blog){
+        if (!blog) {
             throw new Error("Blog not Found!")
         }
 
@@ -89,6 +83,59 @@ export const deleteBlogById = async (req, res) => {
             status: true,
             data: response
         })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
+
+export const updateBlogById = async (req, res) => {
+    const { id } = req.params
+    const { _id } = req.user
+    const { title, content, categoryId, tags } = req.body;
+    try {
+        // Delete the Images from the server:
+        const blog = await Blog.findOne({ _id: id })
+        if (!blog) {
+            throw new Error("Blog not Found!")
+        }
+
+        // todo: Compare the _id with mongoose objectId
+        const canEdit = _id === blog.authorId.toString();
+        if (!canEdit) {
+            throw new Error("You can't Edit this Blog")
+        }
+        const imgArray = req.files.map((file) => `/upload/${file.filename}`)
+        if (imgArray.length > 0) {
+            blog.images.forEach(async (image) => {
+                const imgPath = path.join(path.resolve(), `/public/${image}`)
+                await fs.unlinkSync(imgPath)
+            })
+        }
+
+        const response = await Blog.findByIdAndUpdate(
+            blog?._id,
+            {
+                $set: {
+                    title,
+                    content,
+                    categoryId,
+                    tags,
+                    images: imgArray.length > 0 ? imgArray : blog?.images
+                }
+            }, {
+            new: true
+        }
+        )
+
+        res.status(200).json({
+            status: true,
+            response
+        })
+
     } catch (error) {
         console.log(error)
         res.status(500).json({
