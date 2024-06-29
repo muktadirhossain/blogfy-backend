@@ -1,6 +1,8 @@
 import Blog from "../model/blog.model.js";
 import fs from 'fs';
 import path from 'path';
+import Category from "../model/category.model.js";
+import User from "../model/user.model.js";
 
 export const postBlog = async (req, res) => {
     const { title, content, categoryId, tags } = req.body;
@@ -33,7 +35,19 @@ export const postBlog = async (req, res) => {
 export const getAllBlogs = async (req, res) => {
 
     try {
-        const response = await Blog.find({}).select('-createdAt -updatedAt -__v')
+        const response = await Blog.find({})
+            .populate([{
+                path: 'categoryId',
+                select: 'categoryName _id ',
+                model: Category
+            },
+            {
+                path: 'authorId',
+                select: 'fullName email _id ',
+                model: User
+            }
+            ])
+            .select('-createdAt -updatedAt -__v')
         res.status(200).json({
             status: true,
             data: response
