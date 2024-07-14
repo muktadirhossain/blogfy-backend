@@ -90,7 +90,7 @@ export const login = async (req, res) => {
 }
 
 export const deleteUser = async (req, res) => {
-    const token = req.headers.authorization.replace("Bearer ","")
+    const token = req.headers.authorization.replace("Bearer ", "")
     // console.log(token)
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
@@ -100,7 +100,7 @@ export const deleteUser = async (req, res) => {
 
         res.status(200).json({
             status: true,
- 
+
             message: "User Deleted Successfully!",
 
         })
@@ -109,6 +109,65 @@ export const deleteUser = async (req, res) => {
         res.json({
             status: false,
             message: "Error Deleting User!",
+            error: error.message
+        })
+    }
+}
+
+export const getProfileInfo = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const user = await User.findById(id).select('-password -updatedAt -__v').lean()
+        res.json({
+            status: true,
+            message: "Profile Information",
+            data: user
+        })
+    } catch (error) {
+        res.json({
+            status: false,
+            error: error.message
+        })
+    }
+}
+export const changePassword = async (req, res) => {
+    const id = req.params.id;
+    const { newPassword, password } = req.body;
+    try {
+        // TODO: Check if any user exists::
+        const user = await User.findById(id);
+        // if no user exists, send this message::
+        if (!user && !user?._id) {
+            return res.status(401).json({
+                status: false,
+                message: "Not user exist!, please sign up."
+            })
+        }
+        // TODO: Check if the password is correct::
+
+        const isValidPassword = await bcrypt.compare(password, user.password)
+        if (!isValidPassword) throw new Error("Unauthorized!")
+        // Then change the password::
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        console.log("EVERY", password, newPassword, hashedPassword)
+        const response = await User.findByIdAndUpdate(id, {
+            $set: {
+                password: hashedPassword
+            }
+        }, {
+            new: true
+        })
+
+        console.log(response)
+
+        res.json({
+            status: true,
+            message: "Password Changed Successfully!",
+        })
+    } catch (error) {
+        res.json({
+            status: false,
             error: error.message
         })
     }

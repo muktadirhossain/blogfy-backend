@@ -9,7 +9,7 @@ export const postBlog = async (req, res) => {
 
     const { _id } = req.user
     try {
-        const imgArray = req.files.map((file) => `/upload/${file.filename}`)
+        const imgArray = req?.files?.map((file) => `/upload/${file.filename}`)
 
         const response = await Blog.create({
             title,
@@ -47,7 +47,7 @@ export const getAllBlogs = async (req, res) => {
                 model: User
             }
             ])
-            .select('-createdAt -updatedAt -__v')
+            .select('-updatedAt -__v')
         res.status(200).json({
             status: true,
             data: response
@@ -122,7 +122,7 @@ export const updateBlogById = async (req, res) => {
         if (!canEdit) {
             throw new Error("You can't Edit this Blog")
         }
-        const imgArray = req.files.map((file) => `/upload/${file.filename}`)
+        const imgArray = req?.files?.map((file) => `/upload/${file.filename}`)
         if (imgArray.length > 0) {
             blog.images.forEach(async (image) => {
                 const imgPath = path.join(path.resolve(), `/public/${image}`)

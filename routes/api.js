@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createUser, deleteUser, login } from '../controllers/user.js';
+import { changePassword, createUser, deleteUser, getProfileInfo, login } from '../controllers/user.js';
 import { userValidator } from '../validation/userValidationSchema.js';
 import {
     getAllCategories,
@@ -27,6 +27,8 @@ const apiRouter = Router();
 apiRouter.post('/users/create', userValidator, createUser)
 apiRouter.post('/users/login', login);
 apiRouter.delete('/users/delete', deleteUser)
+apiRouter.get('/users/:id', getProfileInfo)
+apiRouter.post('/users/change-password/:id', changePassword)
 
 // Category::
 apiRouter.post('/category', auth, createCategory)
